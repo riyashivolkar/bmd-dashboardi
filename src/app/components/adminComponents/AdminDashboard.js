@@ -6,7 +6,6 @@ import EmployeePerformance from "./EmployeeTimeTracker";
 import TaskOverview from "./TaskOverview";
 import NotesSection from "../NotesSection";
 import Accounts from "../Accounts";
-import EmployeeTimeTracker from "./EmployeeTimeTracker";
 
 const AdminDashboard = () => {
   const [activeSection, setActiveSection] = useState("taskList");
@@ -17,7 +16,7 @@ const AdminDashboard = () => {
       case "taskList":
         return <TaskList />;
       case "employeePerformance":
-        return <EmployeeTimeTracker />;
+        return <EmployeePerformance />;
       case "taskOverview":
         return <TaskOverview />;
       case "notesSection":
@@ -38,7 +37,9 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="flex text-white bg-gray-900">
+    <div className="flex h-screen text-white bg-gray-900">
+      {" "}
+      {/* Set height to screen */}
       {/* Sidebar */}
       <div className="w-64 h-full p-6 bg-gray-800 border-r border-gray-700">
         <h1 className="mb-6 text-3xl font-bold text-center">Admin Dashboard</h1>
@@ -86,9 +87,10 @@ const AdminDashboard = () => {
           </li>
         </ul>
       </div>
-
       {/* Main Content with Animation */}
-      <div className="flex-grow p-6">
+      <div className="flex-grow h-full p-6">
+        {" "}
+        {/* Set height to full */}
         <div
           className={`fade-in ${
             isAnimating ? "" : "fade-in-active"

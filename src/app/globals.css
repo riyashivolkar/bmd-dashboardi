@@ -50,7 +50,7 @@ button:focus {
     flex-direction: column; /* Stack sidebar and main content */
   }
 }
-
+/* 
 html {
-  zoom: 80%; /* Set zoom level to 80% */
-}
+  zoom: 80%;
+} */
