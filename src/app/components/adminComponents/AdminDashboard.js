@@ -4,8 +4,9 @@ import { useState } from "react";
 import TaskList from "./TaskList";
 import EmployeePerformance from "./EmployeeTimeTracker";
 import TaskOverview from "./TaskOverview";
-import NotesSection from "../NotesSection";
+
 import Accounts from "../Accounts";
+import NotesSection from "./NotesSection";
 
 const AdminDashboard = () => {
   const [activeSection, setActiveSection] = useState("taskList");

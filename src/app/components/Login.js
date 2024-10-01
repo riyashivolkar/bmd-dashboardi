@@ -20,8 +20,11 @@ const Login = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen text-white">
+      <h1 className="pb-12 text-4xl text-transparent bg-gradient-to-r from-green-400 via-orange-500 to-orange-500 bg-clip-text">
+        Build My Documents.
+      </h1>{" "}
       <div className="p-8 transition-transform transform bg-gray-800 rounded-lg shadow-lg w-96 hover:scale-105">
-        <h1 className="mb-6 text-3xl font-semibold text-center">
+        <h1 className="mb-6 text-2xl font-normal text-center text-gray-300">
           {user ? "Logout" : "Login"}
         </h1>
         {error && <p className="mb-4 text-red-500">{error}</p>}
@@ -64,7 +67,7 @@ const Login = () => {
             </div>
             <button
               type="submit"
-              className="w-full p-3 text-white transition bg-indigo-600 rounded hover:bg-indigo-700 focus:outline-none"
+              className="w-full p-3 text-white transition bg-gradient-to-r from-green-400 via-orange-500 to-orange-500 hover:bg-indigo-700 focus:outline-none"
             >
               Login
             </button>
@@ -74,7 +77,7 @@ const Login = () => {
           <div className="text-center">
             <button
               onClick={logout}
-              className="w-full p-3 mt-4 text-white transition bg-red-600 rounded hover:bg-red-700 focus:outline-none"
+              className="w-full p-3 mt-4 text-white transition bg-gradient-to-r from-green-400 via-orange-500 to-orange-500 hover:bg-red-700 focus:outline-none"
             >
               Logout
             </button>
