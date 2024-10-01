@@ -2,22 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #1a202c; /* Dark background (bg-gray-900) */
-  --foreground: #ededed; /* Adjusted foreground color for better contrast */
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a; /* Dark background in dark mode */
-    --foreground: #ededed;
-  }
-}
-
 body {
-  color: var(--foreground);
-  background: var(--background); /* Use the dark background color */
-  font-family: Arial, Helvetica, sans-serif;
+  @apply bg-gray-900; /* Set background color to gray-900 */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Use your desired font */
 }
 
 /* Fade-in animations */
@@ -28,12 +15,6 @@ body {
 
 .fade-in-active {
   opacity: 1;
-}
-
-/* Custom styles */
-body {
-  background-color: #1a202c; /* Use bg-gray-900 for dark background */
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 h1 {
@@ -71,5 +52,5 @@ button:focus {
 }
 
 html {
-  zoom: 80%; /* Set zoom level to 67% */
+  zoom: 80%; /* Set zoom level to 80% */
 }
