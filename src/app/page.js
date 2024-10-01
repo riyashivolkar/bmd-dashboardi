@@ -25,7 +25,7 @@ export default function Home() {
   }
 
   return (
-    <div>
+    <div className="bg-gray-900 ">
       {role === "admin" && <AdminDashboard />}
       {role === "employee" && <EmployeeDashboard />}
     </div>

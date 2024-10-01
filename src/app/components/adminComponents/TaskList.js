@@ -1,22 +1,19 @@
 "use client"; // Ensure this is a client component
 
 import { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
+import Notes from "../employeeComponents/Notes";
 import { db } from "@/app/lib/firebase";
 
 const TaskList = () => {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Define the employee mapping
   const employeeMapping = {
-    birth: "employee1",
-    death: "employee1",
-    ration: "employee2",
-    passport: "employee3",
-    food: "employee3",
-    labour: "employee4",
-    marraige: "employee4",
+    "riya.shivolkar511@gmail.com": ["birth", "death"],
+    "employee2@example.com": ["ration"],
+    "employee3@example.com": ["passport", "food"],
+    "employee4@example.com": ["labour", "marriage"],
   };
 
   useEffect(() => {
@@ -29,15 +26,20 @@ const TaskList = () => {
           ...doc.data(),
         }));
 
-        // Set the tasks state with relevant fields and assigned employees
-        const tasksWithEmployees = tasksData.map((task) => ({
-          clientName: task.name, // Assuming you have 'name' in your document
-          serviceRequested: task.service, // Assuming you have 'service' in your document
-          assignedEmployee: employeeMapping[task.service] || "Not Assigned", // Get assigned employee from mapping
-          taskStatus: task.taskStatus || "Pending", // Fetch task status from Firestore or set default
-          timeTaken: task.timeTaken || "0h 0m", // Fetch or default time taken
-          notes: task.notes || "", // Fetch notes or set default empty
-        }));
+        const tasksWithEmployees = tasksData.map((task) => {
+          const assignedEmployee = Object.keys(employeeMapping).find(
+            (email) => employeeMapping[email].includes(task.serviceRequested) // Ensure to use the correct field
+          );
+
+          return {
+            clientName: task.name || "Unknown Client",
+            serviceRequested: task.serviceRequested || "No Service",
+            assignedEmployee: assignedEmployee || "Not Assigned",
+            taskStatus: task.taskStatus || "Pending",
+            timeTaken: task.timeTaken || "0h 0m",
+            note: task.note || "", // Change from notes array to a single note string
+          };
+        });
 
         setTasks(tasksWithEmployees);
         setLoading(false);
@@ -50,54 +52,97 @@ const TaskList = () => {
     fetchTasks();
   }, []);
 
+  const handleUpdateNote = async (taskId, updatedNote) => {
+    const task = tasks.find((task) => task.id === taskId);
+
+    if (!task) {
+      console.error("Task not found for ID:", taskId);
+      return; // Exit if the task is not found
+    }
+
+    const taskRef = doc(db, "formSubmissions", taskId);
+    try {
+      await updateDoc(taskRef, {
+        note: updatedNote, // Update the note field with the new value
+      });
+
+      // Update local state after successful note update
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task.id === taskId ? { ...task, note: updatedNote } : task
+        )
+      );
+    } catch (error) {
+      console.error("Error updating note:", error);
+    }
+  };
+
   if (loading) {
-    return <div>Loading tasks...</div>;
+    return (
+      <div className="flex items-center justify-center h-screen text-white">
+        Loading tasks...
+      </div>
+    );
   }
 
   return (
-    <div>
-      <h2 className="text-xl font-bold">Assigned Tasks</h2>
-
-      <table className="min-w-full mt-4 border border-collapse border-gray-800">
-        <thead>
-          <tr className="text-black bg-gray-200">
-            <th className="p-2 border border-gray-900">Sr. No.</th>
-            <th className="p-2 border border-gray-900">Client Name</th>
-            <th className="p-2 border border-gray-900">Service Requested</th>
-            <th className="p-2 border border-gray-900">Assigned Employee</th>
-            <th className="p-2 border border-gray-900">Task Status</th>
-            <th className="p-2 border border-gray-900">Time Taken</th>
-            <th className="p-2 border border-gray-900">Notes</th>
-          </tr>
-        </thead>
-        <tbody>
-          {tasks.map((task, index) => (
-            <tr key={task.id}>
-              <td className="p-2 border">{index + 1}</td>
-              <td className="p-2 border">{task.clientName}</td>
-              <td className="p-2 border">{task.serviceRequested}</td>
-              <td className="p-2 border">{task.assignedEmployee}</td>
-              <td
-                className={`p-2 border ${
-                  task.taskStatus === "In Progress"
-                    ? "text-orange-500"
-                    : task.taskStatus === "Done"
-                    ? "text-green-500"
-                    : task.taskStatus === "On Hold"
-                    ? "text-red-500"
-                    : "text-gray-200"
-                }`}
-              >
-                {task.taskStatus}
-              </td>
-              <td className="p-2 border">{task.timeTaken}</td>
-              <td className="p-2 border">{task.notes}</td>
+    <div className="min-h-screen p-6 text-white bg-gray-900">
+      <h2 className="mb-6 text-3xl font-bold text-left">Tasks</h2>
+      <div className="overflow-x-auto">
+        <table className="min-w-full overflow-hidden bg-gray-800 rounded-lg shadow-md">
+          <thead>
+            <tr className="bg-gray-700">
+              <th className="p-4 text-left text-gray-200">Sr. No.</th>
+              <th className="p-4 text-left text-gray-200">Client Name</th>
+              <th className="p-4 text-left text-gray-200">Service Requested</th>
+              <th className="p-4 text-left text-gray-200">Assigned Employee</th>
+              <th className="p-4 text-left text-gray-200">Task Status</th>
+              <th className="p-4 text-left text-gray-200">Time Taken</th>
+              <th className="p-4 text-left text-gray-200">Notes</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {tasks.map((task, index) => (
+              <tr
+                key={task.id}
+                className="border-b border-gray-700 last:border-none"
+              >
+                <td className="p-4">{index + 1}</td>
+                <td className="p-4">{task.clientName}</td>
+                <td className="p-4">{task.serviceRequested}</td>
+                <td className="p-4">{task.assignedEmployee}</td>
+                <td className={`p-4 ${getStatusColor(task.taskStatus)}`}>
+                  {task.taskStatus}
+                </td>
+                <td className="p-4">{task.timeTaken}</td>
+                <td className="p-4">
+                  {task.note ? (
+                    task.note
+                  ) : (
+                    <span className="italic text-gray-500">No notes</span>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
+};
+
+// Helper function to determine text color based on task status
+const getStatusColor = (status) => {
+  switch (status) {
+    case "In Progress":
+      return "text-orange-400";
+    case "Done":
+      return "text-green-400";
+    case "On Hold":
+      return "text-red-400";
+    default:
+      return "text-gray-400";
+  }
 };
 
 export default TaskList;

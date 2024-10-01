@@ -19,13 +19,19 @@ const Login = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen text-black">
-      {/* <h1 class="text-4xl text-center mb-12 font-thin   traack  text-white">
-        Build My Documents.
-      </h1> */}
-      <div className="p-8 bg-white rounded-lg shadow-2xl w-96">
-        <h1 className="mb-6 text-2xl text-center">Login</h1>
-        {error && <p className="text-red-500">{error}</p>}
+    <div className="flex flex-col items-center justify-center min-h-screen text-white">
+      <div className="p-8 transition-transform transform bg-gray-800 rounded-lg shadow-lg w-96 hover:scale-105">
+        <h1 className="mb-6 text-3xl font-semibold text-center">
+          {user ? "Logout" : "Login"}
+        </h1>
+        {error && <p className="mb-4 text-red-500">{error}</p>}
+
+        {/* Show user email if authenticated */}
+        {user && (
+          <p className="mb-4 text-center">
+            <span className="font-semibold">{user.email}</span>
+          </p>
+        )}
 
         {/* Show login form if user is not authenticated */}
         {!user ? (
@@ -40,7 +46,7 @@ const Login = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email"
-                className="block w-full p-3 border border-gray-300 rounded"
+                className="block w-full p-3 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:border-indigo-500"
               />
             </div>
             <div className="mb-4">
@@ -53,12 +59,12 @@ const Login = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
-                className="block w-full p-3 border border-gray-300 rounded"
+                className="block w-full p-3 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:border-indigo-500"
               />
             </div>
             <button
               type="submit"
-              className="w-full p-3 text-white transition bg-indigo-600 rounded hover:bg-indigo-700"
+              className="w-full p-3 text-white transition bg-indigo-600 rounded hover:bg-indigo-700 focus:outline-none"
             >
               Login
             </button>
@@ -66,10 +72,9 @@ const Login = () => {
         ) : (
           // Show logout button if user is authenticated
           <div className="text-center">
-            <p>Welcome, {user.email}!</p>
             <button
               onClick={logout}
-              className="p-3 mt-4 text-white transition bg-red-600 rounded hover:bg-red-700"
+              className="w-full p-3 mt-4 text-white transition bg-red-600 rounded hover:bg-red-700 focus:outline-none"
             >
               Logout
             </button>

@@ -2,9 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { collection, onSnapshot, updateDoc, doc } from "firebase/firestore";
-import { db } from "@/app/lib/firebase"; // Make sure this path is correct
+import { db } from "@/app/lib/firebase"; // Ensure this path is correct
 import { useAuth } from "@/app/utils/context/AuthContext";
 import emailjs from "emailjs-com"; // Import EmailJS
+import Notes from "./Notes"; // Import the Notes component
+import DailySummary from "../TimeTracker";
+import TimeTracker from "../TimeTracker";
 
 const AssignedTasks = () => {
   const [tasks, setTasks] = useState([]);
@@ -26,13 +29,11 @@ const AssignedTasks = () => {
     const publicKey = "TDye-dCbO1zURoJJL"; // Replace with your EmailJS public key
 
     const templateParams = {
-      to_email: employeeEmail, // Recipient's email address
-      task_service: task.service, // Task service name
-      client_name: task.name, // Client name
+      to_email: employeeEmail,
+      task_service: task.service,
+      client_name: task.name,
       current_date: new Date().toLocaleDateString(),
     };
-
-    console.log(`Sending email to ${employeeEmail} for task: ${task.service}`);
 
     emailjs
       .send(serviceID, templateID, templateParams, publicKey)
@@ -113,92 +114,93 @@ const AssignedTasks = () => {
   };
 
   if (loading) {
-    return <div>Loading tasks...</div>;
+    return (
+      <div className="flex items-center justify-center h-screen text-white">
+        Loading tasks...
+      </div>
+    );
   }
 
   return (
-    <div>
-      <h2 className="text-xl font-bold">Assigned Tasks</h2>
+    <div className="min-h-screen p-6 text-white bg-gray-900">
+      <h2 className="mb-6 text-3xl font-bold text-center">Tasks</h2>
       {tasks.length === 0 ? (
-        <p>No tasks assigned to you.</p>
+        <p className="text-center">No tasks assigned to you.</p>
       ) : (
-        <table className="min-w-full mt-4 border border-collapse border-gray-800">
-          <thead>
-            <tr>
-              <th className="p-2 border border-gray-800">Sr. No</th>
-              <th className="p-2 border border-gray-800">Client Name</th>
-              <th className="p-2 border border-gray-800">Service Requested</th>
-              <th className="p-2 border border-gray-800">Email</th>
-              <th className="p-2 border border-gray-800">Phone No</th>
-              <th className="p-2 border border-gray-800">Documents</th>
-              <th className="p-2 border border-gray-800">Task Status</th>
-              <th className="p-2 border border-gray-800">Time Taken</th>
-              <th className="p-2 border border-gray-800">Assigned Employee</th>
-              <th className="p-2 border border-gray-800">Add Notes</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tasks.map((task, taskIndex) => (
-              <tr key={task.id}>
-                <td className="p-2 border border-gray-800">{taskIndex + 1}</td>
-                <td className="p-2 border border-gray-800">{task.name}</td>
-                <td className="p-2 border border-gray-800">{task.service}</td>
-                <td className="p-2 border border-gray-800">{task.email}</td>
-                <td className="p-2 border border-gray-800">{task.phone}</td>
-                <td className="p-2 border border-gray-800">
-                  {task.documents.length > 0
-                    ? task.documents.map((doc, index) => (
-                        <div
-                          key={`${task.id}-${index}`}
-                          className="flex items-center space-x-2"
-                        >
-                          <a
-                            href={doc}
-                            className="text-blue-500"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            Document {index + 1}
-                          </a>
-                        </div>
-                      ))
-                    : "No documents"}
-                </td>
-                <td className="p-2 border border-gray-800">
-                  <select
-                    value={task.taskStatus}
-                    onChange={(e) =>
-                      handleStatusChange(task.id, e.target.value)
-                    }
-                    className={`p-1 rounded ${
-                      task.taskStatus === "In Progress"
-                        ? "bg-orange-500"
-                        : task.taskStatus === "Done"
-                        ? "bg-green-500"
-                        : task.taskStatus === "On Hold"
-                        ? "bg-red-500"
-                        : "bg-gray-900"
-                    }`}
-                  >
-                    <option value="New">New</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Done">Done</option>
-                    <option value="On Hold">On Hold</option>
-                  </select>
-                </td>
-                <td className="p-2 border border-gray-800">{task.timeTaken}</td>
-                <td className="p-2 border border-gray-800">
-                  {task.assignedEmployee}
-                </td>
-                <td className="p-2 border border-gray-800">
-                  <button className="p-1 text-white bg-blue-500 rounded">
-                    Edit
-                  </button>
-                </td>
+        <div className="overflow-x-auto">
+          <table className="min-w-full overflow-hidden bg-gray-800 rounded-lg shadow-md">
+            <thead>
+              <tr className="bg-gray-700">
+                <th className="p-4 text-left text-gray-200">Sr. No</th>
+                <th className="p-4 text-left text-gray-200">Client Name</th>
+                <th className="p-4 text-left text-gray-200">Service</th>
+                <th className="p-4 text-left text-gray-200">Client Email</th>
+                <th className="p-4 text-left text-gray-200">Phone</th>
+                <th className="p-4 text-left text-gray-200">Documents</th>
+                <th className="p-4 text-left text-gray-200">Task Status</th>
+                <th className="p-4 text-left text-gray-200">Add Notes</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {tasks.map((task, taskIndex) => (
+                <tr
+                  key={task.id}
+                  className="border-b border-gray-700 last:border-none"
+                >
+                  <td className="p-4">{taskIndex + 1}</td>
+                  <td className="p-4">{task.name}</td>
+                  <td className="p-4">{task.service}</td>
+                  <td className="p-4">{task.email}</td>
+                  <td className="p-4">{task.phone}</td>
+                  <td className="p-4">
+                    {task.documents.length > 0
+                      ? task.documents.map((doc, index) => (
+                          <div
+                            key={`${task.id}-${index}`}
+                            className="flex items-center space-x-2"
+                          >
+                            <a
+                              href={doc}
+                              className="text-blue-500"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              Document {index + 1}
+                            </a>
+                          </div>
+                        ))
+                      : "No documents"}
+                  </td>
+                  <td className="p-4">
+                    <select
+                      value={task.taskStatus}
+                      onChange={(e) =>
+                        handleStatusChange(task.id, e.target.value)
+                      }
+                      className={`p-2 rounded ${
+                        task.taskStatus === "In Progress"
+                          ? "bg-orange-500"
+                          : task.taskStatus === "Done"
+                          ? "bg-green-500"
+                          : task.taskStatus === "On Hold"
+                          ? "bg-red-500"
+                          : "bg-gray-900"
+                      }`}
+                    >
+                      <option value="New">New</option>
+                      <option value="In Progress">In Progress</option>
+                      <option value="Done">Done</option>
+                      <option value="On Hold">On Hold</option>
+                    </select>
+                  </td>
+                  <td className="p-4">
+                    <Notes taskId={task.id} initialNote={task.note || ""} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );
