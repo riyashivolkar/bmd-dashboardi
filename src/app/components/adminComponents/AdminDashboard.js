@@ -40,7 +40,7 @@ const AdminDashboard = () => {
   return (
     <div className="flex text-white bg-gray-900">
       {/* Sidebar */}
-      <div className="w-64 h-screen p-6 bg-gray-800 border-r border-gray-700">
+      <div className="w-64 h-full p-6 bg-gray-800 border-r border-gray-700">
         <h1 className="mb-6 text-3xl font-bold text-center">Admin Dashboard</h1>
         <ul className="space-y-4">
           <li>

@@ -3,32 +3,22 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #1a202c; /* Dark background (bg-gray-900) */
+  --foreground: #ededed; /* Adjusted foreground color for better contrast */
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: #0a0a0a; /* Dark background in dark mode */
     --foreground: #ededed;
   }
 }
 
 body {
   color: var(--foreground);
-  background: var(--background);
+  background: var(--background); /* Use the dark background color */
   font-family: Arial, Helvetica, sans-serif;
 }
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-}
-
-/* styles/globals.css */
-
-/* styles/globals.css */
 
 /* Fade-in animations */
 .fade-in {
@@ -42,7 +32,7 @@ body {
 
 /* Custom styles */
 body {
-  background-color: #1a202c; /* Dark background */
+  background-color: #1a202c; /* Use bg-gray-900 for dark background */
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -81,5 +71,5 @@ button:focus {
 }
 
 html {
-  zoom: 67%; /* Set zoom level to 67% */
+  zoom: 80%; /* Set zoom level to 67% */
 }
