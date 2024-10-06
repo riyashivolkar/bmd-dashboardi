@@ -6,60 +6,71 @@ import { doc, updateDoc } from "firebase/firestore";
 
 const Notes = ({ taskId, initialNote }) => {
   const [note, setNote] = useState(initialNote);
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false); // New state for submission status
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const toggleExpand = () => {
-    setIsExpanded((prev) => !prev);
-    setIsSubmitted(false); // Reset submission status when expanding/collapsing
-  };
-
-  // Sync note state with initialNote prop
+  // Effect to reset note when initialNote changes
   useEffect(() => {
     setNote(initialNote);
-    setIsSubmitted(false); // Reset submission status when initialNote changes
+    setIsSubmitted(false);
   }, [initialNote]);
 
+  // Function to handle note updates
   const handleUpdateNote = async () => {
     if (note.trim() === "") return; // Prevent saving empty notes
 
-    // Update Firestore with the new note
     const taskDocRef = doc(db, "formSubmissions", taskId);
     await updateDoc(taskDocRef, { note }); // Update the note field
-    setIsSubmitted(true); // Set submission status to true after updating
+    setIsSubmitted(true);
+  };
+
+  // Function to toggle the modal
+  const toggleModal = () => {
+    setIsModalOpen((prev) => !prev);
+    setIsSubmitted(false);
   };
 
   return (
-    <div className="flex flex-col">
+    <div>
       <button
-        className={`p-1 text-white rounded ${
-          isExpanded ? "bg-neutral-500" : "bg-gray-700"
-        }`}
-        onClick={toggleExpand}
+        onClick={toggleModal}
+        className="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-500"
       >
-        {isExpanded ? "Hide Note" : "Show Note"}
+        {isModalOpen ? "Close Note" : "Notes"}
       </button>
-      {isExpanded && (
-        <div className="p-4 mt-2 bg-gray-800 rounded">
-          <div className="mb-4">
-            <textarea
-              value={note} // Set value to the current note
-              onChange={(e) => setNote(e.target.value)} // Update note state on change
-              placeholder="Enter a note..."
-              className="w-full p-2 bg-gray-700 border border-gray-600 rounded"
-              rows={4} // You can set rows to define height
-            />
+
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80">
+          <div className="w-full max-w-md p-6 bg-gray-800 rounded-lg shadow-lg">
+            <h2 className="mb-4 text-2xl font-bold text-gray-200">Notes</h2>
+
+            <div className="mb-4">
+              <textarea
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                placeholder="Enter a note..."
+                className="w-full p-2 bg-gray-700 border border-gray-600 rounded"
+                rows={4}
+              />
+              <button
+                onClick={handleUpdateNote}
+                className="w-full p-2 mt-2 text-white bg-green-500 rounded"
+              >
+                Update Note
+              </button>
+              {isSubmitted && (
+                <p className="mt-2 text-green-400">
+                  Note submitted successfully!
+                </p>
+              )}
+            </div>
+
             <button
-              onClick={handleUpdateNote}
-              className="w-full p-2 mt-2 text-white bg-green-500 rounded"
+              onClick={toggleModal}
+              className="px-6 py-2 mt-4 text-lg text-white bg-blue-600 rounded-md hover:bg-blue-500"
             >
-              Update Note
+              Close
             </button>
-            {isSubmitted && ( // Conditionally render submission status
-              <p className="mt-2 text-green-400">
-                Note submitted successfully!
-              </p>
-            )}
           </div>
         </div>
       )}

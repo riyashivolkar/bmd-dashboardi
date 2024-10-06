@@ -2,19 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { collection, onSnapshot, updateDoc, doc } from "firebase/firestore";
-import { db } from "@/app/lib/firebase"; // Ensure this path is correct
+import { db } from "@/app/lib/firebase";
 import { useAuth } from "@/app/utils/context/AuthContext";
-import emailjs from "emailjs-com"; // Import EmailJS
-import Notes from "./Notes"; // Import the Notes component
-import DailySummary from "../TimeTracker";
-import TimeTracker from "../TimeTracker";
+import emailjs from "emailjs-com";
+import Notes from "./Notes";
+import Reminder from "./Reminder"; // Import the Reminder component
+import ThemeToggle from "../ThemeToggle";
 
 const AssignedTasks = () => {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth(); // Get the logged-in user
+  const { user } = useAuth();
 
-  // Define the employee mapping with their email addresses
   const employeeMapping = {
     "riya.shivolkar511@gmail.com": ["birth", "death"],
     "employee2@example.com": ["ration"],
@@ -22,11 +21,10 @@ const AssignedTasks = () => {
     "employee4@example.com": ["labour", "marriage"],
   };
 
-  // Function to send email using EmailJS
   const sendTaskAssignmentEmail = (employeeEmail, task) => {
-    const serviceID = "service_3zfhxfp"; // Replace with your EmailJS service ID
-    const templateID = "template_fejsbim"; // Replace with your EmailJS template ID
-    const publicKey = "TDye-dCbO1zURoJJL"; // Replace with your EmailJS public key
+    const serviceID = "service_3zfhxfp";
+    const templateID = "template_fejsbim";
+    const publicKey = "TDye-dCbO1zURoJJL";
 
     const templateParams = {
       to_email: employeeEmail,
@@ -54,7 +52,6 @@ const AssignedTasks = () => {
           ...doc.data(),
         }));
 
-        // Assign tasks to employees based on service
         const tasksWithEmployees = tasksData.map((task) => {
           const assignedEmployee = employeeMapping[user.email]?.includes(
             task.service
@@ -68,23 +65,20 @@ const AssignedTasks = () => {
           };
         });
 
-        // Filter tasks based on logged-in user
         const filteredTasks = tasksWithEmployees.filter(
           (task) => task.assignedEmployee === user.email
         );
 
-        // Update tasks state
         setTasks(filteredTasks);
         setLoading(false);
 
-        // Send email to assigned employee for new tasks only
         filteredTasks.forEach((task) => {
           if (
             task.assignedEmployee !== "unassigned" &&
             task.taskStatus === "New"
           ) {
             sendTaskAssignmentEmail(task.assignedEmployee, task);
-            // Update task status to prevent resending
+
             updateDoc(doc(db, "formSubmissions", task.id), {
               taskStatus: "Email Sent",
             });
@@ -93,10 +87,9 @@ const AssignedTasks = () => {
       }
     );
 
-    return () => unsubscribe(); // Cleanup the listener on component unmount
+    return () => unsubscribe();
   }, [user]);
 
-  // Handle status change
   const handleStatusChange = async (id, newStatus) => {
     setTasks((prevTasks) =>
       prevTasks.map((task) =>
@@ -122,8 +115,12 @@ const AssignedTasks = () => {
   }
 
   return (
-    <div className="min-h-screen p-6 text-white bg-gray-900">
-      <h2 className="mb-6 text-3xl font-bold text-center">Tasks</h2>
+    <div className="min-h-screen p-6 ">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="flex-1 text-3xl font-bold text-center ">Tasks</h2>
+
+        <div className="ml-4">{/* <ThemeToggle /> */}</div>
+      </div>
       {tasks.length === 0 ? (
         <p className="text-center">No tasks assigned to you.</p>
       ) : (
@@ -139,6 +136,7 @@ const AssignedTasks = () => {
                 <th className="p-4 text-left text-gray-200">Documents</th>
                 <th className="p-4 text-left text-gray-200">Task Status</th>
                 <th className="p-4 text-left text-gray-200">Add Notes</th>
+                <th className="p-4 text-left text-gray-200">Client Status</th>
               </tr>
             </thead>
             <tbody>
@@ -195,6 +193,9 @@ const AssignedTasks = () => {
                   </td>
                   <td className="p-4">
                     <Notes taskId={task.id} initialNote={task.note || ""} />
+                  </td>
+                  <td className="p-4">
+                    <Reminder task={task} />{" "}
                   </td>
                 </tr>
               ))}

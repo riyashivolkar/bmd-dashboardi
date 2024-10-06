@@ -5,6 +5,7 @@ import AssignedTasks from "./AssignedTasks";
 import AddNotes from "./AddNotes";
 import Accounts from "../Accounts";
 import TimeTracker from "../TimeTracker";
+import ThemeToggle from "../ThemeToggle";
 
 const EmployeeDashboard = () => {
   const [activeSection, setActiveSection] = useState("assignedTasks");
@@ -34,12 +35,12 @@ const EmployeeDashboard = () => {
   };
 
   return (
-    <div className="flex text-white bg-gray-900">
-      {/* Sidebar */}
+    <div className="flex text-white">
       <div className="w-64 h-screen p-6 bg-gray-800 border-r border-gray-700">
         <h1 className="mb-6 text-3xl font-bold text-center ">
           Employee Dashboard
         </h1>
+
         <ul className="space-y-4">
           <li>
             <button

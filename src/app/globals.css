@@ -2,8 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+/* globals.css or styles.css */
+
+/* Default styles for dark mode */
+:root {
+  --background: #111827; /* Set dark mode background to gray-900 */
+  --foreground: #d1d5db; /* Light text color */
+}
+
+/* Light mode styles */
+.light {
+  --background: #f9fafb; /* Light background */
+  --foreground: #111827; /* Dark text color */
+}
+
+
 body {
-  @apply bg-gray-900; /* Set background color to gray-900 */
+  @apply bg-background text-foreground; /* Use the defined colors */
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Use your desired font */
 }
 
@@ -31,7 +46,7 @@ button {
 }
 
 button:hover {
-  background-color: #4338ca; /* Darker shade on hover */
+  background-color: #84819f; /* Darker shade on hover */
 }
 
 button:focus {
@@ -50,10 +65,9 @@ button:focus {
     flex-direction: column; /* Stack sidebar and main content */
   }
 }
-/* 
+
+/*
 html {
   zoom: 80%;
-} */
-
-
-
+}
+*/

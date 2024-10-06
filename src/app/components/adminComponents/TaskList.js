@@ -1,8 +1,8 @@
-"use client"; // Ensure this is a client component
+"use client";
 
 import { useEffect, useState } from "react";
 import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
-import Notes from "../employeeComponents/Notes";
+
 import { db } from "@/app/lib/firebase";
 
 const TaskList = () => {
@@ -27,17 +27,18 @@ const TaskList = () => {
         }));
 
         const tasksWithEmployees = tasksData.map((task) => {
-          const assignedEmployee = Object.keys(employeeMapping).find(
-            (email) => employeeMapping[email].includes(task.serviceRequested) // Ensure to use the correct field
+          const assignedEmployee = Object.keys(employeeMapping).find((email) =>
+            employeeMapping[email].includes(task.service)
           );
 
           return {
+            id: task.id,
             clientName: task.name || "Unknown Client",
-            serviceRequested: task.serviceRequested || "No Service",
+            serviceRequested: task.service || "No Service",
             assignedEmployee: assignedEmployee || "Not Assigned",
             taskStatus: task.taskStatus || "Pending",
-            timeTaken: task.timeTaken || "0h 0m",
-            note: task.note || "", // Change from notes array to a single note string
+            note: task.note || "",
+            statusUpdates: task.statusUpdates || {},
           };
         });
 
@@ -63,10 +64,9 @@ const TaskList = () => {
     const taskRef = doc(db, "formSubmissions", taskId);
     try {
       await updateDoc(taskRef, {
-        note: updatedNote, // Update the note field with the new value
+        note: updatedNote,
       });
 
-      // Update local state after successful note update
       setTasks((prevTasks) =>
         prevTasks.map((task) =>
           task.id === taskId ? { ...task, note: updatedNote } : task
@@ -97,8 +97,8 @@ const TaskList = () => {
               <th className="p-4 text-left text-gray-200">Service Requested</th>
               <th className="p-4 text-left text-gray-200">Assigned Employee</th>
               <th className="p-4 text-left text-gray-200">Task Status</th>
-              <th className="p-4 text-left text-gray-200">Time Taken</th>
               <th className="p-4 text-left text-gray-200">Notes</th>
+              <th className="p-4 text-left text-gray-200">Status Updates</th>
             </tr>
           </thead>
           <tbody>
@@ -114,12 +114,35 @@ const TaskList = () => {
                 <td className={`p-4 ${getStatusColor(task.taskStatus)}`}>
                   {task.taskStatus}
                 </td>
-                <td className="p-4">{task.timeTaken}</td>
                 <td className="p-4">
                   {task.note ? (
                     task.note
                   ) : (
                     <span className="italic text-gray-500">No notes</span>
+                  )}
+                </td>
+                <td className="p-4">
+                  {Object.keys(task.statusUpdates).length > 0 ? (
+                    <ul>
+                      {Object.entries(task.statusUpdates).map(
+                        ([date, status], index) => (
+                          <li key={index}>
+                            {date}:
+                            <span
+                              className={
+                                status === "yes"
+                                  ? "text-green-400"
+                                  : "text-red-400"
+                              }
+                            >
+                              {status}
+                            </span>
+                          </li>
+                        )
+                      )}
+                    </ul>
+                  ) : (
+                    <span className="italic text-gray-500">No updates</span>
                   )}
                 </td>
               </tr>
