@@ -1,200 +1,3 @@
-// "use client";
-
-// import { useEffect, useState } from "react";
-// import { updateDoc, doc } from "firebase/firestore";
-// import { db } from "@/app/lib/firebase";
-
-// // Helper function to format date
-// const formatDate = (date) => {
-//   const day = String(date.getDate()).padStart(2, "0");
-//   const month = String(date.getMonth() + 1).padStart(2, "0");
-//   const year = date.getFullYear();
-//   return `${day}/${month}/${year}`;
-// };
-
-// // Helper function to add days to a date
-// const addDays = (date, days) => {
-//   const result = new Date(date);
-//   result.setDate(result.getDate() + days);
-//   return result;
-// };
-
-// const Reminder = ({ task }) => {
-//   const [isModalOpen, setIsModalOpen] = useState(false);
-//   const [lastReminderStatus, setLastReminderStatus] = useState("no");
-//   const [nextReminderStatus, setNextReminderStatus] = useState("no");
-//   const [lastReminderDate, setLastReminderDate] = useState("");
-//   const [nextReminderDate, setNextReminderDate] = useState("");
-//   const [lastReminders, setLastReminders] = useState([]); // Array to store last reminders
-
-//   useEffect(() => {
-//     if (task?.createdAt) {
-//       const createdAt = task.createdAt.toDate(); // Convert Firestore timestamp to Date object
-//       const today = new Date(); // Current date
-
-//       if (task.taskStatus === "In Progress") {
-//         const reminders = []; // Array to store all past reminders
-//         let currentReminder = new Date(createdAt);
-
-//         // Calculate the reminders starting from `createdAt` every 4 days until today
-//         while (currentReminder <= today) {
-//           reminders.push(new Date(currentReminder)); // Push each reminder into the array
-//           currentReminder = addDays(currentReminder, 4); // Move to the next reminder (4 days later)
-//         }
-
-//         // Set the array of past reminders in state
-//         setLastReminders(reminders.map((date) => formatDate(date)));
-
-//         // Set the last and next reminder dates
-//         const lastReminder = reminders[reminders.length - 1]; // The last reminder date
-//         const nextReminder = addDays(lastReminder, 4); // Next reminder 4 days later
-
-//         setLastReminderDate(formatDate(lastReminder)); // Last reminder date
-//         setNextReminderDate(formatDate(nextReminder)); // Next reminder date
-
-//         // Set the reminder statuses from the task
-//         setLastReminderStatus(task.lastReminderStatus || "no");
-//         setNextReminderStatus(task.nextReminderStatus || "no");
-//       } else {
-//         // If the task is not "In Progress"
-//         setLastReminderDate("N/A");
-//         setNextReminderDate("N/A");
-//         setLastReminders([]);
-//         setLastReminderStatus("no");
-//         setNextReminderStatus("no");
-//       }
-//     } else {
-//       console.error("createdAt is undefined for task:", task);
-//       setLastReminderDate("N/A");
-//       setNextReminderDate("N/A");
-//       setLastReminders([]);
-//     }
-//   }, [task]);
-
-//   const handleToggle = () => {
-//     setIsModalOpen((prev) => !prev);
-//   };
-
-//   const taskDocRef = doc(db, "formSubmissions", task.id);
-
-//   const updateReminderStatus = async (status, isNextReminder) => {
-//     if (isNextReminder) {
-//       setNextReminderStatus(status);
-//     } else {
-//       setLastReminderStatus(status);
-//     }
-
-//     try {
-//       await updateDoc(taskDocRef, {
-//         lastReminderStatus: lastReminderStatus,
-//         nextReminderStatus: isNextReminder ? status : nextReminderStatus,
-//       });
-//     } catch (error) {
-//       console.error("Error updating reminder status:", error);
-//     }
-//   };
-
-//   return (
-//     <div>
-//       <button
-//         onClick={handleToggle}
-//         className={`flex items-center justify-center p-4 text-white transition ${
-//           isModalOpen ? "bg-gray-700" : "bg-gray-600"
-//         } rounded-md text-lg`}
-//       >
-//         {isModalOpen ? "[x] Close Reminder" : "[>] Check Reminder"}
-//       </button>
-
-//       {isModalOpen && (
-//         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80">
-//           <div className="w-full max-w-3xl p-6 bg-gray-800 rounded-lg shadow-lg">
-//             <h2 className="mb-4 text-2xl font-bold text-gray-200">
-//               Status Updated To Client ?
-//             </h2>
-
-//             <div className="flex flex-row pb-4 space-x-4 text-blue-500">
-//               <p>{task.name}</p>
-//               <p>{task.phone}</p>
-//               <p>{task.email}</p>
-//             </div>
-
-//             {/* Show all previous reminders */}
-//             <div className="pb-4">
-//               <h3 className="text-gray-300">Previous Reminders:</h3>
-//               <ul className="text-gray-400 list-disc list-inside">
-//                 {lastReminders.map((date, index) => (
-//                   <li key={index}>{date}</li>
-//                 ))}
-//               </ul>
-//             </div>
-
-//             <div className="flex flex-row items-center space-x-5">
-//               <p className="text-gray-300">Last Reminder: {lastReminderDate}</p>
-//               <div className="flex items-center space-x-2">
-//                 <div className="flex items-center text-gray-300">
-//                   <input
-//                     type="radio"
-//                     value="yes"
-//                     checked={lastReminderStatus === "yes"}
-//                     onChange={() => updateReminderStatus("yes", false)}
-//                     className="w-4 h-4 accent-green-500"
-//                   />
-//                   <span className="ml-2">Yes</span>
-//                 </div>
-//                 <div className="flex items-center text-gray-300">
-//                   <input
-//                     type="radio"
-//                     value="no"
-//                     checked={lastReminderStatus === "no"}
-//                     onChange={() => updateReminderStatus("no", false)}
-//                     className="w-4 h-4 accent-red-500"
-//                   />
-//                   <span className="ml-2">No</span>
-//                 </div>
-//               </div>
-//             </div>
-
-//             <div className="flex flex-row items-center py-2 space-x-5">
-//               <p className="text-gray-300">Next Reminder: {nextReminderDate}</p>
-//               <div className="flex items-center space-x-2">
-//                 <div className="flex items-center text-gray-300">
-//                   <input
-//                     type="radio"
-//                     value="yes"
-//                     checked={nextReminderStatus === "yes"}
-//                     onChange={() => updateReminderStatus("yes", true)}
-//                     className="w-4 h-4 accent-green-500"
-//                   />
-//                   <span className="ml-2">Yes</span>
-//                 </div>
-//                 <div className="flex items-center text-gray-300">
-//                   <input
-//                     type="radio"
-//                     value="no"
-//                     checked={nextReminderStatus === "no"}
-//                     onChange={() => updateReminderStatus("no", true)}
-//                     className="w-4 h-4 accent-red-500"
-//                   />
-//                   <span className="ml-2">No</span>
-//                 </div>
-//               </div>
-//             </div>
-
-//             <button
-//               onClick={handleToggle}
-//               className="px-6 py-3 mt-4 text-lg text-white bg-blue-600 rounded-md hover:bg-blue-500"
-//             >
-//               Close
-//             </button>
-//           </div>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default Reminder;
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -214,6 +17,8 @@ const Reminder = ({ task }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [datesArray, setDatesArray] = useState([]); // Array to store dates
   const [statusUpdates, setStatusUpdates] = useState([]); // Array to store status updates
+  const [currentPage, setCurrentPage] = useState(1); // Current page state
+  const entriesPerPage = 5; // Number of entries to display per page
 
   useEffect(() => {
     if (task?.createdAt) {
@@ -290,11 +95,17 @@ const Reminder = ({ task }) => {
     }
   };
 
+  // Pagination logic
+  const indexOfLastEntry = currentPage * entriesPerPage; // Last entry index
+  const indexOfFirstEntry = indexOfLastEntry - entriesPerPage; // First entry index
+  const currentEntries = datesArray.slice(indexOfFirstEntry, indexOfLastEntry); // Current entries for the page
+  const totalPages = Math.ceil(datesArray.length / entriesPerPage); // Total pages
+
   return (
     <div>
       <button
         onClick={handleToggle}
-        className={`flex items-center justify-center px-4 py-2   text-white transition ${
+        className={`flex items-center justify-center px-4 py-2 text-white transition ${
           isModalOpen ? "bg-gray-700" : "bg-gray-600"
         } rounded-md text-lg`}
       >
@@ -327,7 +138,7 @@ const Reminder = ({ task }) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {datesArray.map((date, index) => (
+                  {currentEntries.map((date, index) => (
                     <tr key={index}>
                       <td className="p-2 text-gray-300 border border-gray-600">
                         {date}
@@ -354,18 +165,37 @@ const Reminder = ({ task }) => {
                           <option value="" className="text-gray-400">
                             Select
                           </option>
-                          <option value="yes" className="">
-                            Yes
-                          </option>
-                          <option value="no" className="">
-                            No
-                          </option>
+                          <option value="yes">Yes</option>
+                          <option value="no">No</option>
                         </select>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+            </div>
+
+            {/* Pagination controls */}
+            <div className="flex justify-between mt-4">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-500 disabled:opacity-50"
+              >
+                Previous
+              </button>
+              <span className="text-gray-300">
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-500 disabled:opacity-50"
+              >
+                Next
+              </button>
             </div>
 
             <button

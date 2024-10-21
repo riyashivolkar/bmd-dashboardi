@@ -47,6 +47,7 @@ export async function POST(req) {
       },
       { merge: true }
     );
+    console.log("Webhook payload:", body);
 
     console.log("Payment saved to Firestore");
     return NextResponse.json(
