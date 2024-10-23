@@ -30,10 +30,24 @@ const AssignedTasks = () => {
   };
 
   const employeeMapping = {
-    "riya.shivolkar511@gmail.com": ["birth", "death"],
-    "employee2@example.com": ["ration"],
-    "employee3@example.com": ["passport", "food"],
-    "employee4@example.com": ["labour", "marriage"],
+    "riya.shivolkar511@gmail.com": [
+      "birth",
+      "death",
+      "ration",
+      "passport",
+      "food",
+
+      "marraige",
+      "senior",
+      "shops",
+      "gst",
+      "msme",
+      "panCard",
+      "law",
+    ],
+    // "employee2@example.com": ["ration"],
+    // "employee3@example.com": ["passport", "food"],
+    // "employee4@example.com": ["labour", "marriage"],
   };
 
   useEffect(() => {
