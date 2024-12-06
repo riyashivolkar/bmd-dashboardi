@@ -19,6 +19,7 @@ const TalkToLawyer = () => {
   const indexOfLastCase = currentPage * casesPerPage;
   const indexOfFirstCase = indexOfLastCase - casesPerPage;
   const currentCases = cases.slice(indexOfFirstCase, indexOfLastCase);
+  const [expandedCases, setExpandedCases] = useState({});
 
   // Calculate total number of pages
   const totalPages = Math.ceil(cases.length / casesPerPage);
@@ -46,6 +47,13 @@ const TalkToLawyer = () => {
     } catch (error) {
       console.error("Error updating task status:", error);
     }
+  };
+
+  const toggleCaseDetails = (caseId) => {
+    setExpandedCases((prevState) => ({
+      ...prevState,
+      [caseId]: !prevState[caseId], // Toggle the expanded state for the case
+    }));
   };
 
   const handlePageChange = (pageNumber) => {
@@ -86,11 +94,11 @@ const TalkToLawyer = () => {
     <div className="min-h-screen p-6">
       <div className="flex items-center justify-between mb-6">
         <h2 className="flex-1 text-3xl font-bold text-center">
-          Talk To Lawyer Cases
+          Talk To Lawyer
         </h2>
       </div>
       {currentCases.length === 0 ? (
-        <p className="text-center">No cases available.</p>
+        <p className="text-center"></p>
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full overflow-hidden bg-gray-800 rounded-lg shadow-md">
@@ -108,7 +116,7 @@ const TalkToLawyer = () => {
                 <th className="p-4 text-left text-gray-200">Case Details</th>
                 <th className="p-4 text-left text-gray-200">Task Status</th>
                 <th className="p-4 text-left text-gray-200"> Notes</th>
-                <th className="p-4 text-left text-gray-200">Client Status</th>
+                <th className="p-4 text-left text-gray-200">Daily</th>
               </tr>
             </thead>
             <tbody>
@@ -138,7 +146,29 @@ const TalkToLawyer = () => {
                   <td className="p-4">{caseItem.selectedDate}</td>
                   <td className="p-4">{caseItem.selectedSlot}</td>
                   <td className="p-4">{caseItem.languages}</td>
-                  <td className="p-4">{caseItem.caseDetails}</td>
+                  <td className="p-4">
+                    <div className="relative">
+                      <p className="p-4">
+                        {expandedCases[caseItem.id]
+                          ? caseItem.caseDetails
+                          : caseItem.caseDetails &&
+                            caseItem.caseDetails.length > 0
+                          ? `${caseItem.caseDetails.substring(0, 70)}...`
+                          : ""}
+                      </p>
+
+                      {caseItem.caseDetails &&
+                        caseItem.caseDetails.length > 0 && (
+                          <button
+                            onClick={() => toggleCaseDetails(caseItem.id)}
+                            className="px-2 py-1 text-indigo-500 bg-gray-900 hover:bg-gray-900 "
+                          >
+                            {expandedCases[caseItem.id] ? "Less" : "More"}
+                          </button>
+                        )}
+                    </div>
+                  </td>
+
                   <td className="p-4">
                     <select
                       value={caseItem.taskStatus}
@@ -168,7 +198,7 @@ const TalkToLawyer = () => {
                     />
                   </td>
                   <td className="p-4">
-                    <Reminder task={caseItem} />
+                    <Reminder task={caseItem} collection="talktolawyer" />
                   </td>
                 </tr>
               ))}
