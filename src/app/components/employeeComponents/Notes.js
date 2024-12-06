@@ -34,7 +34,7 @@ const Notes = ({ taskId, initialNote }) => {
     <div>
       <button
         onClick={toggleModal}
-        className="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-500"
+        className="px-4 py-2 text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
       >
         {isModalOpen ? "Close Note" : "Notes"}
       </button>

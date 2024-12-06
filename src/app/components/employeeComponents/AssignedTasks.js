@@ -24,6 +24,25 @@ const AssignedTasks = () => {
 
   // Calculate total number of pages
   const totalPages = Math.ceil(tasks.length / tasksPerPage);
+  const handleStatusChange = async (taskId, newStatus) => {
+    try {
+      // Update the task's status in the Firestore collection
+      await updateDoc(doc(db, "formSubmissions", taskId), {
+        taskStatus: newStatus,
+      });
+
+      // Update the local state to reflect the change
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task.id === taskId ? { ...task, taskStatus: newStatus } : task
+        )
+      );
+
+      console.log(`Task ${taskId} status updated to ${newStatus}`);
+    } catch (error) {
+      console.error("Error updating task status:", error);
+    }
+  };
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -91,7 +110,7 @@ const AssignedTasks = () => {
             task.assignedEmployee !== "unassigned" &&
             task.taskStatus === "New"
           ) {
-            sendTaskAssignmentEmail(task.assignedEmployee, task);
+            // sendTaskAssignmentEmail(task.assignedEmployee, task);
 
             updateDoc(doc(db, "formSubmissions", task.id), {
               taskStatus: "Email Sent",

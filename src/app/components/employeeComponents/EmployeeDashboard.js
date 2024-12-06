@@ -6,6 +6,7 @@ import AddNotes from "./AddNotes";
 import Accounts from "../Accounts";
 import TimeTracker from "../TimeTracker";
 import ThemeToggle from "../ThemeToggle";
+import TalkToLawyer from "./TalkToLawyer";
 
 const EmployeeDashboard = () => {
   const [activeSection, setActiveSection] = useState("assignedTasks");
@@ -15,6 +16,8 @@ const EmployeeDashboard = () => {
     switch (activeSection) {
       case "assignedTasks":
         return <AssignedTasks />;
+      case "talktolawyer":
+        return <TalkToLawyer />;
       case "timeTracker":
         return <TimeTracker />;
       case "addNotes":
@@ -48,6 +51,14 @@ const EmployeeDashboard = () => {
               onClick={() => handleSectionChange("assignedTasks")}
             >
               Assigned Tasks
+            </button>
+          </li>
+          <li>
+            <button
+              className="w-full p-3 transition duration-200 rounded-lg hover:bg-gray-700"
+              onClick={() => handleSectionChange("talktolawyer")}
+            >
+              Talk To Lawyer
             </button>
           </li>
           <li>
