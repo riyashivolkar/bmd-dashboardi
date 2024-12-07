@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { db } from "@/app/lib/firebase"; // Ensure this path is correct
 import { doc, updateDoc } from "firebase/firestore";
 
-const Notes = ({ taskId, initialNote }) => {
+const Notes = ({ taskId, initialNote, collectionName }) => {
   const [note, setNote] = useState(initialNote);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -19,9 +19,13 @@ const Notes = ({ taskId, initialNote }) => {
   const handleUpdateNote = async () => {
     if (note.trim() === "") return; // Prevent saving empty notes
 
-    const taskDocRef = doc(db, "formSubmissions", taskId);
-    await updateDoc(taskDocRef, { note }); // Update the note field
-    setIsSubmitted(true);
+    try {
+      const taskDocRef = doc(db, collectionName, taskId); // Use dynamic collection name
+      await updateDoc(taskDocRef, { note }); // Update the note field
+      setIsSubmitted(true);
+    } catch (error) {
+      console.error("Error updating note:", error);
+    }
   };
 
   // Function to toggle the modal

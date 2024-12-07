@@ -215,7 +215,11 @@ const AssignedTasks = () => {
                     </select>
                   </td>
                   <td className="p-4">
-                    <Notes taskId={task.id} initialNote={task.note || ""} />
+                    <Notes
+                      collectionName="formSubmissions"
+                      taskId={task.id}
+                      initialNote={task.note || ""}
+                    />
                   </td>
                   <td className="p-4">
                     <Reminder task={task} />

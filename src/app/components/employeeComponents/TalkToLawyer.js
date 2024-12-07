@@ -193,6 +193,7 @@ const TalkToLawyer = () => {
                   </td>
                   <td className="p-4">
                     <Notes
+                      collectionName="talktolawyer"
                       taskId={caseItem.id}
                       initialNote={caseItem.note || ""}
                     />
